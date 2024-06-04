@@ -1274,6 +1274,24 @@ bool IncrementalMapper::EstimateInitialTwoViewGeometry(
     return false;
   }
 
+  LOG(INFO) << StringPrintf(
+              "Inliers found between initial images (%d - %d): %d/%d",
+              image_id1, image_id2,
+              two_view_geometry.inlier_matches.size(), 
+              options.init_min_num_inliers
+            );
+  LOG(INFO) << StringPrintf(
+              "Forward motion among initial images(%d - %d): %f/%f",
+              image_id1, image_id2,
+              std::abs(two_view_geometry.cam2_from_cam1.translation.z()), 
+              options.init_max_forward_motion
+            );
+  LOG(INFO) << StringPrintf(
+              "Triangulation angle from initial images(%d - %d): %f/%f",
+              image_id1, image_id2,
+              RadToDeg(two_view_geometry.tri_angle), 
+              options.init_min_tri_angle
+            );
   if (static_cast<int>(two_view_geometry.inlier_matches.size()) >=
           options.init_min_num_inliers &&
       std::abs(two_view_geometry.cam2_from_cam1.translation.z()) <

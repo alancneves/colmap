@@ -290,12 +290,17 @@ IncrementalMapperController::InitializeReconstruction(
       "Initializing with image pair #%d and #%d", image_id1, image_id2);
   mapper.RegisterInitialImagePair(
       mapper_options, two_view_geometry, image_id1, image_id2);
+  LOG(INFO) << "Registered images before GBA: " << reconstruction.NumRegImages();
+  LOG(INFO) << "Registered points before GBA: " << reconstruction.NumPoints3D();
 
   LOG(INFO) << "Global bundle adjustment";
   mapper.AdjustGlobalBundle(mapper_options, options_->GlobalBundleAdjustment());
   reconstruction.Normalize();
   mapper.FilterPoints(mapper_options);
   mapper.FilterImages(mapper_options);
+
+  LOG(INFO) << "Registered images after GBA: " << reconstruction.NumRegImages();
+  LOG(INFO) << "Registered points after GBA: " << reconstruction.NumPoints3D();
 
   // Initial image pair failed to register.
   if (reconstruction.NumRegImages() == 0 || reconstruction.NumPoints3D() == 0) {
@@ -442,6 +447,14 @@ IncrementalMapperController::ReconstructSubModel(
       IterativeGlobalRefinement(*options_, mapper_options, mapper);
     }
   } while (reg_next_success || prev_reg_next_success);
+
+  // Last info
+  LOG(INFO) << StringPrintf(
+          "\n=> Registration results: %d / %d (%.1f%)",
+          reconstruction->NumRegImages(),
+          reconstruction->NumImages(),
+          (reconstruction->NumRegImages() / float(reconstruction->NumImages()) * 100));
+          
 
   if (CheckIfStopped()) {
     return Status::INTERRUPTED;
