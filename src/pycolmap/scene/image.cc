@@ -57,7 +57,7 @@ void BindImage(py::module& m) {
   PyImage.def(py::init<>())
       .def(py::init(&MakeImage<Point2D>),
            "name"_a = "",
-           "points2D"_a = Point2DVector(),
+           py::arg_v("points2D", Point2DVector(), "ListPoint2D()"),
            "cam_from_world"_a = Rigid3d(),
            "camera_id"_a = kInvalidCameraId,
            "id"_a = kInvalidImageId)
@@ -87,13 +87,6 @@ void BindImage(py::module& m) {
           },
           "The pose of the image, defined as the transformation from world to "
           "camera space.")
-      .def_property(
-          "cam_from_world_prior",
-          py::overload_cast<>(&Image::CamFromWorldPrior),
-          [](Image& self, const Rigid3d& cam_from_world) {
-            self.CamFromWorldPrior() = cam_from_world;
-          },
-          "The pose prior of the image, e.g. extracted from EXIF tags.")
       .def_property(
           "points2D",
           py::overload_cast<>(&Image::Points2D),
